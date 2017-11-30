@@ -4,15 +4,16 @@ import {
   Text,
   View,
   Button,
-  Image
+  Image,
+  Alert
 } from 'react-native'
 import axios from 'axios'
 
 export default class App extends React.Component {
 
   state = {
-    firstCard: '',
-    actualCardNumber: 0
+    Card: '',
+    actualCardNumber: 0,
   }
 
   fetchCard = async () => await axios.get('https://deckofcardsapi.com/api/deck/new/draw/?count=1')
@@ -20,25 +21,54 @@ export default class App extends React.Component {
   fetchRandomFirst =  () => {
     this.fetchCard()
       .then(res => {
-        let firstCard = res.data.cards[0]
-        const actualCardNumber = firstCard.value
-        this.setState({ firstCard,  actualCardNumber})
+        let Card = res.data.cards[0]
+        const actualCardNumber = Card.value
+        this.setState({ Card,  actualCardNumber})
       })
   }
 
   betNextWillBeHigher = () => {
+    const { actualCardNumber  } = this.state
+    let previousNumber = actualCardNumber
+    this.fetchCard()
+      .then(res => {
+        let Card = res.data.cards[0]
+        let actualCardNumber = Card.value
+        this.setState({Card, actualCardNumber})
 
+        if (previousNumber < actualCardNumber) {
+          Alert.alert('Yeahh!! You Won :) ')
+        }else{
+          Alert.alert('Sorry, You Loose :(')
+        }
+      })
+  }
+
+  betNextWillBeLower = () => {
+    const { actualCardNumber  } = this.state
+    let previousNumber = actualCardNumber
+    this.fetchCard()
+      .then(res => {
+        let Card = res.data.cards[0]
+        let actualCardNumber = Card.value
+        this.setState({Card, actualCardNumber})
+
+        if (previousNumber > actualCardNumber) {
+          Alert.alert('Yeahh!! You Won :) ')
+        }else{
+          Alert.alert('Sorry, You Loose :(')
+        }
+      })
   }
 
   render() {
-      const firstCard = this.state.firstCard.image
-      console.warn(this.state.actualCardNumber)
+      const Card = this.state.Card.image
       return (
         <View style={styles.container}>
           <View style={styles.imageContainer}>
             {
-              !firstCard ? <Text style={styles.text}>Fetch your  first card</Text>
-              : <Image style={styles.images} source={{uri: firstCard}}/>
+              !Card ? <Text style={styles.text}>Fetch your  first card</Text>
+              : <Image style={styles.images} source={{uri: Card}}/>
             }
           </View>
           <View style={styles.allButtonsContainer}>
@@ -49,7 +79,7 @@ export default class App extends React.Component {
                 color="#2ecc71"
               />
               <Button
-                onPress={()=>console.warn('hello')}
+                onPress={this.betNextWillBeLower}
                 title="Lower"
                 color="#3498db"
               />
