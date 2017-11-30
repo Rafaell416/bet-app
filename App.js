@@ -11,17 +11,28 @@ import axios from 'axios'
 export default class App extends React.Component {
 
   state = {
-    firstCard: ''
+    firstCard: '',
+    actualCardNumber: 0
   }
 
-  fetchRandomFirst = async () => {
-    let card = await axios.get('https://deckofcardsapi.com/api/deck/new/draw/?count=1')
-    const firstCard = card.data.cards[0]
-    this.setState({ firstCard })
+  fetchCard = async () => await axios.get('https://deckofcardsapi.com/api/deck/new/draw/?count=1')
+
+  fetchRandomFirst =  () => {
+    this.fetchCard()
+      .then(res => {
+        let firstCard = res.data.cards[0]
+        const actualCardNumber = firstCard.value
+        this.setState({ firstCard,  actualCardNumber})
+      })
+  }
+
+  betNextWillBeHigher = () => {
+
   }
 
   render() {
       const firstCard = this.state.firstCard.image
+      console.warn(this.state.actualCardNumber)
       return (
         <View style={styles.container}>
           <View style={styles.imageContainer}>
@@ -33,7 +44,7 @@ export default class App extends React.Component {
           <View style={styles.allButtonsContainer}>
             <View style={styles.buttonContainer}>
               <Button
-                onPress={()=>console.warn('world')}
+                onPress={this.betNextWillBeHigher}
                 title="Higher"
                 color="#2ecc71"
               />
